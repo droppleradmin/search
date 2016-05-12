@@ -1,2 +1,6 @@
 # search
-Code for Quick Search and supporting scrapers
+Quick Search servlet and supporting code
+
+searchTree.java contains Quick Search servlet
+
+treePopTool.java contains populator for searchTree
