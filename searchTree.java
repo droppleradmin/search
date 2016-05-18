@@ -1,19 +1,30 @@
-import java.io.*;
-import java.servlet.*;
-import java.servlet.http.*; //import
+package com.dropplermusic.search;
 
-import java.util.*; //import TreeMap
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import java.sql.*; //import JDBC
+import java.util.*;
+import java.sql.*;
 
-import treePopTool.*; //I AM NOT SURE IF IMPORTS WORK THIS WAY
+import com.dropplermusic.search.treePopTool.*;
 
-public class searchTree extends HttpServlet {
+/**
+ * Servlet implementation class quickSearch
+ */
+@WebServlet("/quickSearch")
+public class quickSearch extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
 	
 	private String message;
 	
-	//Python connect line for reference
-	//_mysql.connect("beatlist.cbifx5hgposw.us-west-2.rds.amazonaws.com","blessing","temppassword",db="stage")
 	static final String JDBC_Driver = null; //Not sure yet, should be something like "com.mysql.jdbc.driver"
 	static final String DB_URL = "jdbc:mysql://beatlist.cbifx5hgposw.us-west-2.rds.amazonaws.com/main";
 	static final String USER = "blessing";
@@ -21,25 +32,36 @@ public class searchTree extends HttpServlet {
 	
 	TreeMap searchMap = null;
 	
-	public void init() throws ServletException
-	{
-		//LOAD DATA STRUCTURE
-		searchMap = generate();	
+    public quickSearch() {
+        super();
+        // TODO Auto-generated constructor stub
+        
+        searchMap = generate();	
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		//response.getWriter().append("Served at: Test: Cherry Slurpee: ").append(request.getContextPath());
+		//System.out.println(searchMap.entrySet().toString());
+		
+		response.getWriter().append(String.valueOf(searchMap.size())); //For Testing
+		
+		//for response.getWriter().append(searchMap.get(request.getHeader("search").toString());
 	}
 	
 	public static TreeMap generate(){
-		treePopTool.generate();
+		return treePopTool.generate();
 	}
 
-	public void doGet(httpServletRequest request, HttpServletResponse response) throws ServletExceptoin, IOException{	
-		//Setting response type
-		response.setContentType("test/html");
-		//The traversal will go here
-		System.out.println(searchMap.entrySet().toString());
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
 	}
-	
-	public void destroy()
-	{
-		//pass- pretty sure
-	}
+
 }
