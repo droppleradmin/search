@@ -1,3 +1,5 @@
+package com.dropplermusic.search;
+
 import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -13,26 +15,67 @@ public class treePopTool{
 	static final String USER = "blessing";
 	static final String PASS = "temppassword";
 	
-	public static TreeMap generate(){
+	public static String[] concat(String[] a, String[] b) {
+		   int aLen = a.length;
+		   int bLen = b.length;
+		   String[] c= new String[aLen+bLen];
+		   System.arraycopy(a, 0, c, 0, aLen);
+		   System.arraycopy(b, 0, c, aLen, bLen);
+		   return c;
+		}
+	
+	public static TreeMap<String, String[]> generate(){
 		Connection db = null;
 		Statement query = null;
-		TreeMap newMap = new TreeMap(); 
+		TreeMap<String, String[]> newMap = new TreeMap<String, String[]>(); 
 		try{
 			//Registering JDBC driver
-			//class.forName(JDBC_Driver);
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			
 			//Opening connection
 			db = DriverManager.getConnection(DB_URL, USER, PASS);
 			
 			//Query
-			query = db.createStatement();
-			ResultSet result = query.executeQuery("select * from track where name like '%' LIMIT 1000");
-			while(result.next()){
-				String Track = result.getString("name");
-				newMap.put(Track.subString(0,4),result.getInt("id"));
+			
+			
+			//String prefix = "";
+			//Query = "select * from artist where name Like '"+prefix+"%' Order By Popularity DESC LIMIT 10000000"
+			
+			for(char prefix = 'A'; prefix <= 'Z';prefix++) {
+				query = db.createStatement();
+				ResultSet artistResult = query.executeQuery("select * from artist where name Like '"+prefix+"%' Order By Popularity DESC LIMIT 10");
+				ResultSet trackResult = query.executeQuery("select * from track where name Like '"+prefix+"%' Order By Popularity DESC LIMIT 10");
+				ResultSet albumResult = query.executeQuery("select * from album where name Like '"+prefix+"%' Order By Popularity DESC LIMIT 10");
+				String[] topArtist = new String[3];
+				String[] topTrack = new String[3];
+				String[] topAlbum = new String[3];
+				/*while(result.next()){
+					String Artist = result.getString("name");
+					newMap.put(Track.substring(0,4),result.getInt("id"));
+					newMap.put(Artist.substring(0,1),result.getString("name"));
+					
+				}*/
+				for(int a=0; a<3;a++){
+					artistResult.next();
+					trackResult.next();
+					albumResult.next();
+
+					topArtist[a] = artistResult.getString("name");
+					topTrack[a] = trackResult.getString("name");
+					topAlbum[a] = albumResult.getString("name");
+				}	
+				newMap.put(String.valueOf(prefix),concat(concat(topArtist,topTrack),topAlbum));
+				artistResult.close();
+				trackResult.close();
+				albumResult.close();
+				query.close();
 			}
-			result.close();
-			query.close();
+			
+			
+			/*for(char alphabet = 'A'; alphabet <= 'Z';alphabet++) {
+			    System.out.println(alphabet);
+			}*/
+				
 			db.close();
 		}catch(SQLException se){
 			//Handle errors for JDBC
@@ -57,6 +100,7 @@ public class treePopTool{
 					se.printStackTrace();
 			}
 		}
+		return newMap;
 	}
 	
 	
